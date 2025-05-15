@@ -1,0 +1,115 @@
+// RESOURCE SCHEDULING EXCEL SOLUTION
+
+// This Excel workbook has multiple sheets to help with resource scheduling:
+// 1. Data sheets (Projects, Requirements, Personnel, Current Assignments)
+// 2. Resource Allocation Dashboard
+// 3. Resource Availability View
+// 4. Resource Matching Tool
+// 5. Scheduling Calendar
+
+// STEP 1: SETTING UP THE DATA STRUCTURE
+// First, create the four data tables shown in the previous artifact.
+// Organize them into separate sheets named:
+// - Projects
+// - Requirements
+// - Personnel
+// - Assignments
+
+// STEP 2: CREATE A RESOURCE ALLOCATION DASHBOARD
+
+// This formula calculates total hours assigned per employee per week
+=SUMIFS(Assignments[HoursPerWeek], Assignments[EmployeeID], [@EmployeeID], 
+        Assignments[StartDate], "<="&WeekStartDate, 
+        Assignments[EndDate], ">="&WeekEndDate)
+
+// STEP 3: CREATE AVAILABILITY CALCULATIONS
+
+// Formula to calculate remaining hours available:
+=[@MaxHoursPerWeek]-SUMIFS(Assignments[HoursPerWeek], Assignments[EmployeeID], [@EmployeeID])
+
+// STEP 4: CREATE PIVOT TABLE FOR RESOURCE ALLOCATION
+
+// Fields:
+// Rows: EmployeeName, Role
+// Columns: Weeks (calculated from project dates)
+// Values: Sum of HoursPerWeek
+// Filter: ProjectName, Status
+
+// STEP 5: CREATE A RESOURCE MATCHING QUERY
+
+// Query using Power Query to match available resources to requirements:
+// 1. Start with Requirements table
+// 2. Add a column for "Skills Required" (parsed from SkillsRequired field)
+// 3. Join with Personnel table on matching skills
+// 4. Filter for personnel with sufficient availability
+// 5. Sort by best match (most skills matching)
+
+// Power Query M Code (sample):
+let
+    Source = Excel.CurrentWorkbook(){[Name="Requirements"]}[Content],
+    #"Filtered Rows" = Table.SelectRows(Source, each [StartDate] >= DateTime.LocalNow()),
+    #"Added Custom" = Table.AddColumn(#"Filtered Rows", "SkillsList", each Text.Split([SkillsRequired], "/")),
+    #"Expanded SkillsList" = Table.ExpandListColumn(#"Added Custom", "SkillsList"),
+    #"Merged Queries" = Table.NestedJoin(#"Expanded SkillsList", {"SkillsList"}, Personnel, {"Skills"}, "PersonnelMatches", JoinKind.Inner),
+    #"Expanded PersonnelMatches" = Table.ExpandTableColumn(#"Merged Queries", "PersonnelMatches", {"EmployeeID", "EmployeeName", "MaxHoursPerWeek"}, {"EmployeeID", "EmployeeName", "MaxHoursPerWeek"}),
+    #"Added Availability" = Table.AddColumn(#"Expanded PersonnelMatches", "AvailableHours", each [MaxHoursPerWeek] - GetAssignedHours([EmployeeID], [StartDate], [EndDate]))
+in
+    #"Added Availability"
+
+// STEP 6: CREATE RESOURCE SCHEDULING CALENDAR VIEW
+
+// This is a calendar-style view showing:
+// - Weeks across the top (columns)
+// - Employees down the side (rows)
+// - Color-coded project assignments in cells
+// - Utilization percentage
+
+// Conditional formatting rule for cell colors based on project:
+=IF(COUNTIFS(Assignments[EmployeeID], $B4, Assignments[StartDate], "<="&D$3, Assignments[EndDate], ">="&D$3)>0, 
+    INDEX(Projects[PriorityLevel], MATCH(LOOKUP(1, (Assignments[EmployeeID]=$B4)*(Assignments[StartDate]<=D$3)*(Assignments[EndDate]>=D$3), Assignments[ProjectID]), Projects[ProjectID], 0)),
+    "Available")
+
+// STEP 7: CREATE AUTOMATED SCHEDULING RECOMMENDATIONS
+
+// This formula identifies the best available resource for each unassigned requirement:
+=TEXTJOIN(", ", TRUE, 
+    IF(COUNTIFS(Personnel[Skills], "*"&[@SkillsRequired]&"*", 
+               AvailabilityTable[AvailableHours], ">="&[@HoursPerWeek]), 
+        FILTER(Personnel[EmployeeName], 
+               (ISNUMBER(SEARCH([@SkillsRequired], Personnel[Skills])))*(AvailabilityTable[AvailableHours]>=[@HoursPerWeek])),
+        "No match"))
+
+// STEP 8: CREATE RESOURCE UTILIZATION CHART
+
+// Formula to calculate utilization percentage:
+=SUMIFS(Assignments[HoursPerWeek], Assignments[EmployeeID], [@EmployeeID])/[@MaxHoursPerWeek]
+
+// Chart: Horizontal bar chart showing:
+// - Employees on Y-axis
+// - Utilization percentage on X-axis
+// - Color thresholds: <70% (green), 70-90% (yellow), >90% (red)
+
+// STEP 9: CREATE RESOURCE GAPS REPORT
+
+// This identifies requirements without sufficient assigned resources:
+=IF(SUMIFS(Assignments[HoursPerWeek], Assignments[RequirementID], [@RequirementID])<[@HoursPerWeek],
+    "UNDERSTAFFED: "&TEXT([@HoursPerWeek]-SUMIFS(Assignments[HoursPerWeek], Assignments[RequirementID], [@RequirementID]), "0")&" hours needed",
+    "Fully staffed")
+
+// STEP 10: CREATE AN INTERACTIVE DASHBOARD USING SLICERS
+
+// Add slicers for:
+// - Date Range
+// - Project
+// - Role
+// - Location
+// - Skills
+
+// STEP 11: SET UP AUTOMATED DATA REFRESH AND CALCULATIONS
+
+// Use VBA or Power Query to refresh all calculations when data changes:
+Sub RefreshResourceData()
+    Sheets("Availability").Calculate
+    Sheets("Allocation").PivotTables("PivotAllocation").RefreshTable
+    Sheets("Dashboard").Calculate
+End Sub

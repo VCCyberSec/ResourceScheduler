@@ -1,0 +1,151 @@
+// DASHBOARD VISUALIZATION CODE
+
+// This represents the formulae and structure to create a visual resource scheduling dashboard in Excel.
+
+// 1. EXECUTIVE SUMMARY VIEW
+// Top section of dashboard showing key metrics:
+
+// Formula for overall resource utilization:
+=AVERAGE(Availability[UtilizationPercent])
+
+// Formula for resource gap count:
+=COUNTIFS(Requirements[Status],"Unassigned")
+
+// Formula for overallocated resources:
+=COUNTIFS(Availability[UtilizationPercent],">90%")
+
+// Formula for project count by status:
+=COUNTIFS(Projects[Status],"Active")
+
+// 2. RESOURCE HEATMAP
+
+// This creates a heatmap visualization showing resource allocation over time
+// X-axis: Weeks (calculated from current date + 12 weeks)
+// Y-axis: Resources (employees)
+// Cell values: Utilization percentage per week with conditional formatting
+
+// Formula to calculate weekly utilization for each employee:
+=SUMIFS(Assignments[HoursPerWeek],
+        Assignments[EmployeeID],[@EmployeeID],
+        Assignments[StartDate],"<="&WeekEndDate,
+        Assignments[EndDate],">="&WeekStartDate)/[@MaxHoursPerWeek]
+
+// Conditional formatting rules:
+// 0-50%: Green (#92D050)
+// 51-80%: Yellow (#FFEB84)
+// 81-100%: Orange (#FFC000)
+// >100%: Red (#FF0000)
+
+// 3. PROJECT TIMELINE VIEW
+
+// This creates a Gantt chart visualization showing project timelines
+// X-axis: Weeks/Months
+// Y-axis: Projects
+// Bars: Project duration with resource count indicator
+
+// Formula for timeline cell:
+=IF(AND(Projects[@StartDate]<=CurrentColumnDate,Projects[@EndDate]>=CurrentColumnDate),
+  COUNTIFS(Assignments[ProjectID],Projects[@ProjectID],
+           Assignments[StartDate],"<="&CurrentColumnDate,
+           Assignments[EndDate],">="&CurrentColumnDate),
+  "")
+
+// 4. RESOURCE GAPS VISUALIZATION
+
+// This creates a table highlighting resource requirements without sufficient assignments
+// Columns: Project, Requirement, Role, Skills, Hours Needed, Hours Assigned, Gap, Potential Matches
+
+// Formula for hours gap:
+=[@HoursPerWeek]-SUMIFS(Assignments[HoursPerWeek],Assignments[RequirementID],[@RequirementID])
+
+// Formula for potential matches:
+=CONCATENATE(
+  TEXTJOIN(", ",TRUE,
+    FILTER(Personnel[EmployeeName],
+      (ISNUMBER(SEARCH([@SkillsRequired],Personnel[Skills])))*(AvailabilityTable[AvailableHours]>=[@HoursGap])
+    )
+  )
+)
+
+// 5. SKILLS COVERAGE CHART
+
+// This creates a radar chart showing skills coverage across the organization
+// Each axis: A skill category
+// Values: Count of resources with that skill
+// Multiple series: Current allocation vs total capability
+
+// Formula to count resources with specific skill:
+=COUNTIFS(Personnel[Skills],"*"&SkillName&"*")
+
+// Formula to count available resources with specific skill:
+=COUNTIFS(Personnel[Skills],"*"&SkillName&"*",Availability[AvailableHours],">0")
+
+// 6. INTERACTIVE FILTERS
+
+// Add slicers connected to the data:
+// - Date Range
+// - Project
+// - Department
+// - Location
+// - Priority Level
+
+// 7. CAPACITY FORECAST CHART
+
+// This creates a line chart showing capacity forecast over time
+// X-axis: Weeks
+// Y-axis: Hours
+// Series: Total capacity, Assigned hours, Available hours
+
+// Formula for total capacity by week:
+=SUMIFS(Personnel[MaxHoursPerWeek],Personnel[Status],"Active")
+
+// Formula for assigned hours by week:
+=SUMIFS(Assignments[HoursPerWeek],
+        Assignments[StartDate],"<="&WeekEndDate,
+        Assignments[EndDate],">="&WeekStartDate)
+
+// Formula for available hours by week:
+=[TotalCapacity]-[AssignedHours]
+
+// 8. RESOURCE ALLOCATION BY PROJECT CHART
+
+// This creates a stacked bar chart showing allocation by project
+// X-axis: Projects
+// Y-axis: Hours
+// Stacks: Different resource types/roles
+
+// PivotTable structure:
+// Rows: ProjectName
+// Columns: Role
+// Values: Sum of HoursPerWeek
+
+// 9. UTILIZATION TREND CHART
+
+// This creates a line chart showing utilization trend over time
+// X-axis: Weeks
+// Y-axis: Utilization percentage
+// Multiple lines: Different departments or resource types
+
+// Formula for weekly utilization by department:
+=SUMIFS(Assignments[HoursPerWeek],
+        Assignments[Department],DepartmentName,
+        Assignments[StartDate],"<="&WeekEndDate,
+        Assignments[EndDate],">="&WeekStartDate)/
+SUMIFS(Personnel[MaxHoursPerWeek],Personnel[Department],DepartmentName)
+
+// 10. NEW ASSIGNMENT FORM
+
+// This creates a form for easily adding new assignments
+// Fields:
+// - Project (dropdown)
+// - Resource (filtered dropdown based on skills match)
+// - Start Date
+// - End Date
+// - Hours Per Week
+
+// VBA code to add assignment:
+Sub AddAssignment()
+    ' Code to validate and add new assignment to Assignments table
+    ' Check for resource availability before confirming
+    ' Update all connected visualizations
+End Sub

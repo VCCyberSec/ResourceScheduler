@@ -1,0 +1,82 @@
+// SAMPLE DATA SHEET 1: PROJECT ENGAGEMENTS
+
+ProjectID,ProjectName,ClientName,StartDate,EndDate,Status,PriorityLevel
+P001,Website Redesign,Acme Corp,5/20/2025,8/15/2025,Active,High
+P002,Mobile App Development,TechStart Inc,6/1/2025,9/30/2025,Active,Medium
+P003,Data Migration,Global Finance,5/15/2025,6/30/2025,Active,High
+P004,CRM Implementation,Retail Partners,7/1/2025,10/15/2025,Planned,Low
+P005,Security Audit,Healthcare Systems,5/25/2025,6/25/2025,Active,Critical
+P006,Cloud Migration,Manufacturing Plus,8/1/2025,11/15/2025,Planned,Medium
+P007,Business Intelligence Dashboard,Travel Co,6/15/2025,8/30/2025,Planned,Medium
+
+// SAMPLE DATA SHEET 2: PROJECT RESOURCE REQUIREMENTS
+
+RequirementID,ProjectID,RoleNeeded,SkillsRequired,HoursPerWeek,StartDate,EndDate
+R001,P001,Project Manager,Project Management/Client Communication,20,5/20/2025,8/15/2025
+R002,P001,UI Designer,UI/UX Design/Wireframing,30,5/25/2025,7/10/2025
+R003,P001,Front-end Developer,HTML/CSS/JavaScript,40,6/1/2025,8/15/2025
+R004,P001,Back-end Developer,Python/Database,30,6/15/2025,8/15/2025
+R005,P002,Project Manager,Project Management/Mobile,15,6/1/2025,9/30/2025
+R006,P002,Mobile Developer,iOS/Swift,40,6/1/2025,9/15/2025
+R007,P002,Mobile Developer,Android/Kotlin,40,6/1/2025,9/15/2025
+R008,P002,QA Tester,Mobile Testing,30,7/15/2025,9/30/2025
+R009,P003,Data Analyst,SQL/ETL,40,5/15/2025,6/30/2025
+R010,P003,Database Administrator,SQL Server/Oracle,20,5/15/2025,6/30/2025
+R011,P004,CRM Consultant,Salesforce/CRM,40,7/1/2025,10/15/2025
+R012,P004,Business Analyst,Requirements Gathering,30,7/1/2025,8/15/2025
+R013,P005,Security Specialist,Penetration Testing/Security Audits,40,5/25/2025,6/25/2025
+R014,P006,Cloud Architect,AWS/Azure,40,8/1/2025,11/15/2025
+R015,P006,DevOps Engineer,Docker/Kubernetes,30,8/15/2025,11/15/2025
+R016,P007,Data Scientist,Python/R/Power BI,40,6/15/2025,8/30/2025
+
+// SAMPLE DATA SHEET 3: PERSONNEL DATABASE
+
+EmployeeID,EmployeeName,Role,Skills,MaxHoursPerWeek,CostRate,Location
+E001,John Smith,Project Manager,Project Management/Client Communication/Agile,40,125,HQ
+E002,Emily Johnson,Project Manager,Project Management/Mobile/Scrum Master,40,130,HQ
+E003,Michael Wang,UI Designer,UI/UX Design/Wireframing/Figma,40,110,Remote
+E004,Sarah Garcia,Front-end Developer,HTML/CSS/JavaScript/React,40,105,HQ
+E005,David Kim,Back-end Developer,Python/Database/Django,40,115,Remote
+E006,Lisa Chen,Mobile Developer,iOS/Swift/React Native,40,120,HQ
+E007,Ryan Martinez,Mobile Developer,Android/Kotlin/Java,40,115,Remote
+E008,Jennifer Lee,QA Tester,Mobile Testing/Automated Testing,40,95,HQ
+E009,Robert Wilson,Data Analyst,SQL/ETL/Python,40,100,Remote
+E010,Amanda Brown,Database Administrator,SQL Server/Oracle/PostgreSQL,40,130,HQ
+E011,Kevin Taylor,CRM Consultant,Salesforce/CRM/Business Process,40,140,Remote
+E012,Jessica Adams,Business Analyst,Requirements Gathering/Process Modeling,40,110,HQ
+E013,Thomas Nelson,Security Specialist,Penetration Testing/Security Audits/Compliance,40,150,Remote
+E014,Michelle Lewis,Cloud Architect,AWS/Azure/GCP,40,160,HQ
+E015,Daniel Moore,DevOps Engineer,Docker/Kubernetes/CI/CD,40,145,Remote
+E016,Sophia Rodriguez,Data Scientist,Python/R/Power BI/Machine Learning,40,135,HQ
+E017,Alex Turner,Front-end Developer,HTML/CSS/JavaScript/Angular,40,105,Remote
+E018,Rachel Green,UI Designer,UI/UX Design/Figma/Adobe XD,40,105,HQ
+E019,Chris Peterson,Back-end Developer,Java/Spring/REST APIs,40,120,Remote
+E020,Olivia Wilson,Project Manager,Project Management/Financial/PMP,40,135,HQ
+
+// SAMPLE DATA SHEET 4: CURRENT ASSIGNMENTS
+
+AssignmentID,EmployeeID,ProjectID,RequirementID,StartDate,EndDate,HoursPerWeek,Status
+A001,E001,P001,R001,5/20/2025,8/15/2025,20,Confirmed
+A002,E003,P001,R002,5/25/2025,7/10/2025,30,Confirmed
+A003,E004,P001,R003,6/1/2025,8/15/2025,40,Confirmed
+A004,E009,P003,R009,5/15/2025,6/30/2025,40,Confirmed
+A005,E010,P003,R010,5/15/2025,6/30/2025,20,Confirmed
+A006,E013,P005,R013,5/25/2025,6/25/2025,40,Confirmed
+
+// RESOURCE ALLOCATION MATRIX
+
+// This is a pivot table or structured data showing which employees are assigned to which projects over time
+// Each row represents an employee, columns represent weeks, and cells contain project assignments
+
+// RESOURCE AVAILABILITY CALCULATION
+
+// For each employee, calculate:
+// Total available hours per week (from Personnel sheet)
+// Currently assigned hours per week (from Assignments sheet)
+// Remaining availability = Total available - Currently assigned
+
+// RESOURCE SCHEDULER VIEW
+
+// Week numbers across the top (Week 21-2025 through Week 50-2025)
+// Employees on rows
+// Cells show: ProjectID - RequirementID (Hours)
